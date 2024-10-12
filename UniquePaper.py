@@ -13,7 +13,13 @@ os.environ["http_proxy"] = "http://127.0.0.1:xxxx"
 os.environ["https_proxy"] = "http://127.0.0.1:xxxx"
 
 # If modifying these scopes, delete the file token.json.
-SCOPES = ['https://www.googleapis.com/auth/gmail.readonly']
+# read only
+# SCOPES = ['https://www.googleapis.com/auth/gmail.readonly']
+# read and modify
+SCOPES = [
+    'https://www.googleapis.com/auth/gmail.readonly',
+    'https://www.googleapis.com/auth/gmail.modify'
+    ]
 
 def get_gmail_service():
     creds = None
@@ -37,8 +43,8 @@ def get_gmail_service():
 
 def get_unread_messages(service):
     # print(type(service))
-    # results = service.users().messages().list(userId='me', labelIds=['INBOX', 'UNREAD']).execute()
-    results = service.users().messages().list(userId='me', maxResults=10).execute()
+    results = service.users().messages().list(userId='me', labelIds=['INBOX', 'UNREAD']).execute()
+    # results = service.users().messages().list(userId='me', maxResults=10).execute()
     messages = results.get('messages', [])
 
     Dicts = {'TitleKey':[], 'value':[]}
@@ -61,6 +67,9 @@ def get_unread_messages(service):
               google_scholar_sender = 1
         if google_scholar_sender:
           cout += 1
+          # remove the "UNREAD" TAG of current message
+          service.users().messages().modify(userId='me', id=message['id'], 
+            body={'removeLabelIds': ['UNREAD']}).execute()
           # The Body of the message is in Encrypted format. So, we have to decode it.
           # Get the data and decode it with base 64 decoder.
           data         = payload['body']['data']
