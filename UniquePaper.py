@@ -9,8 +9,8 @@ from googleapiclient.discovery import build
 from markdown_strings import header, table, code_block
 
 # set the proxy of yourself computer, xxxx is the proxy port
-os.environ["http_proxy"] = "http://127.0.0.1:xxxx"
-os.environ["https_proxy"] = "http://127.0.0.1:xxxx"
+os.environ["http_proxy"] = "http://127.0.0.1:7897"
+os.environ["https_proxy"] = "http://127.0.0.1:7897"
 
 # If modifying these scopes, delete the file token.json.
 # read only
@@ -62,7 +62,7 @@ def get_unread_messages(service):
 
         for d in headers:
           if d['name'] == 'From':
-            sender   = d['value']
+            sender = d['value']
             if "Google Scholar Alerts" in sender or "Google 学术搜索快讯" in sender:
               google_scholar_sender = 1
         if google_scholar_sender:
@@ -89,25 +89,29 @@ def get_unread_messages(service):
               Dicts['TitleKey'].append(title.text)
               Dicts['value'].append(str(title)+"\n<font color=#006621>"+author.text+"</font>\n"+abs_.text)
     
-    # location of markdown file for saving the content
-    savepath = "E:/DESKTOP/GoogleScholar/"
-    if not os.path.exists(savepath):
-      os.mkdir(savepath)
-    # filename of markdown file with time
-    timestr  = time.strftime('%Y%m%d', time.localtime())
-    filename = f"{savepath}{timestr}_google_scholar_.md"
-    # if file is not exists, then creat it
-    if not os.path.exists(filename):
-      open(filename, "w").close()
+    if cout != 0:
+      # location of markdown file for saving the content
+      # savepath = "E:/DESKTOP/GoogleScholar/"
+      savepath = "E:/0Phd/0Goole_Scholar_md/"
+      if not os.path.exists(savepath):
+        os.mkdir(savepath)
+      # filename of markdown file with time
+      timestr  = time.strftime('%Y%m%d', time.localtime())
+      filename = f"{savepath}{timestr}_google_scholar_.md"
+      # if file is not exists, then creat it
+      # if not os.path.exists(filename):
+      #   open(filename, "w").close()
 
-    print(f'Unread messages:{cout} ----- Unique paper:{len(Dicts["TitleKey"])}\n\n\n')
-    # write the dict "Dicts" into markdown file
-    with open(filename, 'w', encoding="utf8") as file:
-      file.write(f'Unread messages:{cout}\nUnique paper:{len(Dicts["TitleKey"])}\n\n\n')
-      for value in Dicts['value']:
-        file.write(f'{value}\n\n\n')
+      print(f'Unread messages:{cout} ----- Unique paper:{len(Dicts["TitleKey"])}\n\n\n')
+
+      # write the dict "Dicts" into markdown file
+      with open(filename, 'a+', encoding="utf8") as file:
+        file.write(f'Unread messages:{cout}\nUnique paper:{len(Dicts["TitleKey"])}\n\n\n')
+        for value in Dicts['value']:
+          file.write(f'{value}\n\n\n')
 
 def main():
+  # print(os.getcwd())
     service = get_gmail_service()
     get_unread_messages(service)
 
